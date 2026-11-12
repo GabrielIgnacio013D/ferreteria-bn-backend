@@ -1,0 +1,17 @@
+{
+  "name": "ferreteria-bn-backend",
+  "version": "0.1.0",
+  "description": "Backend REST de la Ferretería BN (DSY1104 Desarrollo Fullstack II)",
+  "main": "server.js",
+  "engines": { "node": ">=20.6" },
+  "scripts": {
+    "start": "node --env-file=.env server.js",
+    "dev": "node --env-file=.env --watch server.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "pg": "^8.16.0"
+  }
+}
