@@ -7,12 +7,12 @@ Backend REST del proyecto semestral **Ferretería BN** · DSY1104 Desarrollo Ful
 ## 1. Identificación y alcance
 
 - **Proyecto:** Ferretería BN (tienda en línea de productos de ferretería).
-- **Integrantes:** _[completar nombres del equipo]_
+- **Integrante:** Gabriel Fuentes (trabajo individual).
 - **Alcance del backend:** autenticación (registro, login, JWT), catálogo de productos y categorías, solicitudes/compras, administración y reportes, según el ERS del proyecto.
 
 ## 2. Frontend
 
-- Repositorio del frontend (React + Vite): _[pegar enlace]_
+- Repositorio del frontend (React + Vite): _[pendiente de enlazar]_
 - El README del frontend debe enlazar de vuelta a este repositorio.
 
 ## 3. Decisiones técnicas
@@ -29,10 +29,32 @@ Backend REST del proyecto semestral **Ferretería BN** · DSY1104 Desarrollo Ful
 
 ## 4. Diseño de datos
 
-- **Diagrama entidad-relación:** _[enlace de Drive con acceso de lectura para el docente]_
-- Entidades previstas: usuarios, roles, categorías, productos, solicitudes y detalle de solicitud.
-- Reglas de integridad, restricciones y decisión al eliminar registros relacionados: _pendiente de diseñar_.
-- **Estado:** pendiente.
+- **Diagrama entidad-relación:** `docs/diagrama-er.png` en este repositorio. _[Pendiente: subirlo a Drive y pegar aquí el enlace con acceso de lectura para el docente]_
+- **Script SQL:** `docs/schema.sql` (tablas, restricciones y datos iniciales de prueba). _Escrito, aún no ejecutado en RDS._
+- **Entidades:** `roles`, `usuarios`, `categorias`, `productos`, `solicitudes` y `detalle_solicitud`. Salen de los módulos del frontend: catálogo, administración de productos y categorías, ítems críticos, usuarios y solicitudes.
+
+### Relaciones y cardinalidades
+
+- Un rol tiene muchos usuarios; cada usuario tiene un solo rol (1:N).
+- Un usuario realiza muchas solicitudes (1:N).
+- Una solicitud contiene muchos detalles, y cada detalle pertenece a una sola solicitud (1:N).
+- Una categoría agrupa muchos productos (1:N).
+- Un producto aparece en muchos detalles de solicitud (1:N). La relación entre solicitudes y productos es de muchos a muchos y se resuelve con la tabla `detalle_solicitud`.
+
+### Reglas de integridad
+
+- **No duplicados:** correo de usuario, nombre de rol, nombre de categoría y un mismo producto dentro de una misma solicitud.
+- **Valores válidos:** `precio > 0`, `stock >= 0`, `stock_critico >= 0`, `cantidad > 0`, `precio_unitario > 0`, `total >= 0` y `estado` solo con los valores PENDIENTE, CONFIRMADA, ENVIADA, ENTREGADA o CANCELADA.
+- **Relaciones obligatorias:** todo producto tiene categoría, todo usuario tiene rol, toda solicitud tiene usuario.
+- **Al eliminar:** una categoría con productos, un producto ya vendido y un usuario con solicitudes no se pueden borrar (`RESTRICT`); se desactivan con el campo `activo`, para no perder el historial. Si se elimina una solicitud, sus detalles se eliminan con ella (`CASCADE`).
+- **Precio del detalle:** `precio_unitario` guarda el precio al momento de la compra, para que cambios posteriores del precio del producto no alteren solicitudes antiguas.
+- **Calculado por el servidor:** `precio_unitario`, `total`, `estado` inicial, rol inicial del usuario y fechas. El cliente solo envía producto y cantidad.
+
+### Del frontend simulado a datos iniciales
+
+Los productos y categorías simulados del frontend pasan a `INSERT` iniciales en `schema.sql`. Los usuarios no se cargan por SQL: se crean desde la API para guardar la contraseña con hash. Todo lo guardado en la base persiste cuando se reinicia el backend.
+
+- **Estado:** diseñado. Pendiente: ejecutar el script en RDS y verificar.
 
 ## 5. Organización y responsabilidades
 
@@ -49,7 +71,7 @@ src/models/               -> forma de los datos de entrada/salida
 docs/                     -> especificación OpenAPI
 ```
 
-Reparto de responsabilidades por integrante: _[completar]_
+Responsabilidades: Gabriel Fuentes asume todas las capas (backend, base de datos, seguridad y documentación).
 
 ## 6. API y documentación
 
@@ -94,8 +116,8 @@ Despliegue en EC2: _pendiente de documentar con pasos reproducibles._
 
 ## 9. Estado del trabajo
 
-- **Hecho:** repositorio y estructura base, conexión a la base preparada, `GET /api/health`.
-- **Pendiente:** diagrama entidad-relación, esquema SQL, endpoints de catálogo, autenticación y JWT, roles, Swagger, pruebas, integración con el frontend.
+- **Hecho:** repositorio y estructura base, conexión a la base preparada, `GET /api/health`; modelo de datos diseñado (diagrama y script SQL escritos).
+- **Pendiente:** ejecutar el esquema en RDS, endpoints de catálogo, autenticación y JWT, roles, Swagger, pruebas, integración con el frontend.
 - **Dificultades:** _se irán registrando_.
 
 ## 10. Checklist
